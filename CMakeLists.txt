@@ -10,4 +10,4 @@ set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -static -std=c99 -mwindows  ") # -mwindows 
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} )
 
-
+target_link_libraries(${PROJECT_NAME} -lcomctl32)
