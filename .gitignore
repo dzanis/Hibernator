@@ -1,0 +1,5 @@
+/localdata/*
+
+/debug/*
+/release/*
+CMakeLists.txt.user
