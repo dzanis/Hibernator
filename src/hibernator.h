@@ -105,13 +105,13 @@ DWORD WINAPI thread_func(void *arg)
         }
 */
         int lastInputTime = GetLastInputTime()/60; // convert sec to min
-        notyfyiconUpdate(lastInputTime);//обновление иконки в трее
-
+        notyfyiconUpdate(lastInputTime);//обновление иконки в трее // NOTE comment for TaoRen
+        //setIconNumber(lastInputTime);// NOTE for TaoRen чтоб обновлялась иконка каждую секунду
         if(lastInputTime >= *minutes )
         {            
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
             //модальное вопросительное окно
-            if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) == IDYES)
+            if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) == IDYES)// NOTE comment for TaoRen
             {
                 //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
                 system("shutdown -h");//переводим компьютер в гибернацию
