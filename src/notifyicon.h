@@ -58,7 +58,6 @@ static HICON CreateSmallIcon( HWND hWnd , TCHAR *szText)
     return hIcon;
 }
 
-static int lastInputTime = 0;
 static int prevlastInputTime = 0;
 
 static boolean viewToogle = FALSE;
@@ -81,30 +80,19 @@ void notyfyiconNumberViewToogle(char a_minutesOff)
 {
    nc_minutesOff = (int)a_minutesOff;
    viewToogle = !viewToogle;
-   setIconNumber(lastInputTime);
 }
 
-
-static DWORD WINAPI thread_update_icon(void *arg)
+/// lastInputTime - последняя активность пользователя в минутах
+void notyfyiconUpdate(int lastInputTime)//обновление иконки в трее
 {
-    int * lastInputTime = (int*)arg;
-    while(1)
-    {
-        setIconNumber(*lastInputTime);
-        Sleep(1000 * 60);
-    }
-}
-
-
-
-
-void notyfyiconUpdate(int a_lastInputTime)//обновление иконки в трее
-{
-    lastInputTime = a_lastInputTime;
-    if(lastInputTime == 0 && prevlastInputTime > 0)// не чаше одного раза в минуту
-    {
+    // такая логика обновляет иконку не чаще одного раза в минуту
+    if( (lastInputTime == 0 && prevlastInputTime > 0) ||
+        (lastInputTime - prevlastInputTime >= 1)   )
+    {        
         setIconNumber(lastInputTime);
+        printf("lastInputTime == %d \n" ,lastInputTime );
     }
+
     prevlastInputTime = lastInputTime;
 }
 
@@ -122,7 +110,6 @@ void notyfyiconUpdate(int a_lastInputTime)//обновление иконки в
 
     setIconNumber(0);
 
-    CreateThread(NULL,0,thread_update_icon,&lastInputTime, 0, NULL);
 }
 
 

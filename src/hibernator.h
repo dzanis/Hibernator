@@ -19,13 +19,13 @@
 
 HANDLE thread;
 DWORD WINAPI thread_func(void *arg);
-
+int * h_warning;
 
 /// minutes - количество минут неактивности пользователя,после прошествия которых отправить в гибернацию
-void hibernatorStart( void * minutes)
+void hibernatorStart( void * minutes , int * _warning)
 {
     thread = CreateThread(NULL,0,thread_func,minutes, 0, NULL);
-
+    h_warning = _warning;
 }
 
 /// остановить проверку, например при закрытии приложения
@@ -104,17 +104,19 @@ DWORD WINAPI thread_func(void *arg)
             hibernatorStartHibernation = 0;
         }
 */
-        int lastInputTime = GetLastInputTime()/60; // convert sec to min
-        notyfyiconUpdate(lastInputTime);//обновление иконки в трее // NOTE comment for TaoRen
-        //setIconNumber(lastInputTime);// NOTE for TaoRen чтоб обновлялась иконка каждую секунду
+        int lastInputTime = GetLastInputTime()/60;// convert sec to min
+        notyfyiconUpdate(lastInputTime);//обновление иконки в трее
+
         if(lastInputTime >= *minutes )
         {            
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
             //модальное вопросительное окно
-            if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) == IDYES)// NOTE comment for TaoRen
+            if(*h_warning)
+            if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
+                continue;
             {
-                //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
-                system("shutdown -h");//переводим компьютер в гибернацию
+                MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
+                //system("shutdown -h");//переводим компьютер в гибернацию
             }
 
             CloseHandle(thread);
