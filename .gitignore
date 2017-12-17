@@ -1,5 +1,9 @@
 /localdata/*
-
 /debug/*
-/release/*
 CMakeLists.txt.user
+
+!release/
+#исключим всё содержимое папки
+release/*
+#кроме конкретного файла
+!release/hibernator.exe 
