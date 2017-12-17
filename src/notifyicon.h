@@ -1,8 +1,9 @@
 #pragma once
 
+
 #include <windows.h>
 #include <stdio.h>
-
+#include "settings.h"
 
 #define MY_NOTIFYICON (WM_APP+100)
 
@@ -58,6 +59,7 @@ static HICON CreateSmallIcon( HWND hWnd , TCHAR *szText)
     return hIcon;
 }
 
+static int lastInputTime = 0;
 static int prevlastInputTime = 0;
 
 static boolean viewToogle = FALSE;
@@ -66,7 +68,7 @@ static int nc_minutesOff;
 
 static void setIconNumber(int number)
 {
-    number = viewToogle ? number : nc_minutesOff - number;
+    number = viewToogle ? number : minutesOff - number;
     TCHAR buf[2] ;
     sprintf( buf, TEXT( number > 9 ? "%d" : " %d" ), number ) ;
     pnid.hIcon = CreateSmallIcon(NULL,buf);
@@ -76,15 +78,16 @@ static void setIconNumber(int number)
 
 ///функция нужна для переключения показа вариантов вида отсчета
 ///или сколько минут нет активности или сколько осталось до гибернации
-void notyfyiconNumberViewToogle(char a_minutesOff)
+void notyfyiconNumberViewToogle()
 {
-   nc_minutesOff = (int)a_minutesOff;
    viewToogle = !viewToogle;
+   setIconNumber(0);
 }
 
 /// lastInputTime - последняя активность пользователя в минутах
-void notyfyiconUpdate(int lastInputTime)//обновление иконки в трее
+void notyfyiconUpdate(int _lastInputTime)//обновление иконки в трее
 {
+    lastInputTime = _lastInputTime;
     // такая логика обновляет иконку не чаще одного раза в минуту
     if( (lastInputTime == 0 && prevlastInputTime > 0) ||
         (lastInputTime - prevlastInputTime >= 1)   )

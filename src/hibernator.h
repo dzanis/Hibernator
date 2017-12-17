@@ -14,18 +14,19 @@
 ========================================================================
 */
 #pragma once
+
 #include <windows.h>
 #include "notifyicon.h"
+#include "settings.h"
 
 HANDLE thread;
 DWORD WINAPI thread_func(void *arg);
-int * h_warning;
+
 
 /// minutes - количество минут неактивности пользователя,после прошествия которых отправить в гибернацию
-void hibernatorStart( void * minutes , int * _warning)
+void hibernatorStart()
 {
-    thread = CreateThread(NULL,0,thread_func,minutes, 0, NULL);
-    h_warning = _warning;
+    thread = CreateThread(NULL,0,thread_func,NULL, 0, NULL);
 }
 
 /// остановить проверку, например при закрытии приложения
@@ -88,8 +89,6 @@ static int hibernatorStartHibernation = 0;
 
 DWORD WINAPI thread_func(void *arg)
 {
-    int *minutes = (int *)arg;
-
 
     while(1)
     {
@@ -107,11 +106,11 @@ DWORD WINAPI thread_func(void *arg)
         int lastInputTime = GetLastInputTime()/60;// convert sec to min
         notyfyiconUpdate(lastInputTime);//обновление иконки в трее
 
-        if(lastInputTime >= *minutes )
+        if(lastInputTime >= minutesOff )
         {            
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
             //модальное вопросительное окно
-            if(*h_warning)
+            if(warning)
             if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
                 continue;
             {

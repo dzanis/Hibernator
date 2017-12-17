@@ -12,9 +12,9 @@
 #include "notifyicon.h"
 #include "hibernator.h"
 #include "screenshoter.h"
+#include "settings.h"
 
 
-typedef enum { false, true } bool;
 
  HICON hIconImg;// иконка программы
 
@@ -23,49 +23,12 @@ const int height = 160;
 
 const char programName[] = "Hibernator 17.12.17";
 const wchar_t textInfo[] = L"При бездействии пользователя,\n гибернизация начнётся через %ld мин \nСвернуть для фоновой работы. \nВ трее индикация бездействия в минутах\nСкриншот региона дисплея Ctrl+Alt+P";
-char  minutesOff = 30; //через сколько минут выключить, от 1 до 99 минут
-int warning = 0;
+
 
 #define HOTKEY 1000
 
 
-/// если файл успешно прочитан то вернёт FALSE (т.к это означает что не первый старт)
-bool settings(bool save)
-{
-    bool firstStart = true;
-    wchar_t exeName[MAX_PATH + 1];
-    GetModuleFileNameW(NULL, exeName, MAX_PATH + 1);
-    wcscat(exeName,L".dat");
 
-    FILE* f;
-    if(save)
-    {
-        f = _wfopen(exeName, L"wb");//Создает двоичный файл для записи.
-        if(f)
-        {
-        fputc(minutesOff,f);
-        fputc(warning,f);
-        }
-
-    }
-    else
-    {
-        f = _wfopen(exeName, L"rb");// Открывает двоичный файл для чтения.
-        if(f)
-        {
-            minutesOff = fgetc(f);
-            warning = fgetc(f);
-            firstStart = false;
-        }
-    }
-     if(f)
-     fclose(f);
-
-     return firstStart;
-    // wchar_t buf[4];
-    // wsprintfW(buf, L"%ld", saves.minutesOff);
-    // MessageBoxW(NULL,buf,L"",MB_OK|MB_ICONEXCLAMATION);
-}
 
 /// добавить программу в автозагрузку (не используется)
 void addToStartUp(int startupAdd)
@@ -192,8 +155,8 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
 
     if ((wp & 0xFFF0) == SC_MINIMIZE)// если окно свернуто то сворачиваем в трей
     {
-        settings(true);// save settings
-        notyfyiconNumberViewToogle(minutesOff);// toogle number view
+        settings_save(true);// save settings
+        notyfyiconNumberViewToogle();// toogle number view
         Shell_NotifyIcon(NIM_ADD, &pnid);
         ShowWindow(hwnd, SW_HIDE);
         return 0;
@@ -213,7 +176,7 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
         if(MessageBox(NULL,"Du you wont exit?","",MB_YESNO|MB_ICONQUESTION) != IDYES)
             return 0;
         {
-            settings(true);// save settings
+            settings_save(true);// save settings
             hibernatorStop();
             DestroyIcon(pnid.hIcon);
             PostQuitMessage(0);                     // Send A Quit Message
@@ -250,7 +213,7 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, int nCmdShow)
 {
-    bool firstStart = settings(false);// load settings
+    bool firstStart = settings_save(false);// load settings
     HWND hMainWnd;
     MSG uMsg;
 
@@ -289,10 +252,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
     {
        ShowWindow(hMainWnd, SW_HIDE);
        Shell_NotifyIcon(NIM_ADD, &pnid);
-       notyfyiconNumberViewToogle(minutesOff);// toogle number view
+       notyfyiconNumberViewToogle();// toogle number view
     }
 
-    hibernatorStart(&minutesOff,&warning);
+    hibernatorStart();
     //addToStartUp(0); // добавить программу в автозагрузку
     //takeScreenShot();// тест скриншота
 
