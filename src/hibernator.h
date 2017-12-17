@@ -115,8 +115,8 @@ DWORD WINAPI thread_func(void *arg)
             if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
                 continue;
             {
-                MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
-                //system("shutdown -h");//переводим компьютер в гибернацию
+                //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
+                system("shutdown -h");//переводим компьютер в гибернацию
             }
 
             CloseHandle(thread);
