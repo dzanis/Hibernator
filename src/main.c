@@ -21,10 +21,10 @@ typedef enum { false, true } bool;
 const int width = 340;
 const int height = 160;
 
-const char programName[] = "Hibernator 16.12.17";
+const char programName[] = "Hibernator 17.12.17";
 const wchar_t textInfo[] = L"При бездействии пользователя,\n гибернизация начнётся через %ld мин \nСвернуть для фоновой работы. \nВ трее индикация бездействия в минутах\nСкриншот региона дисплея Ctrl+Alt+P";
 char  minutesOff = 30; //через сколько минут выключить, от 1 до 99 минут
-
+int warning = 0;
 
 #define HOTKEY 1000
 
@@ -42,7 +42,11 @@ bool settings(bool save)
     {
         f = _wfopen(exeName, L"wb");//Создает двоичный файл для записи.
         if(f)
+        {
         fputc(minutesOff,f);
+        fputc(warning,f);
+        }
+
     }
     else
     {
@@ -50,6 +54,7 @@ bool settings(bool save)
         if(f)
         {
             minutesOff = fgetc(f);
+            warning = fgetc(f);
             firstStart = false;
         }
     }
@@ -102,8 +107,8 @@ void updateText()
 }
 
 
-static void CreateControls(HWND hwnd) {
-
+static void CreateControls(HWND hwnd)
+{
     INITCOMMONCONTROLSEX icex;
 
     icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -129,7 +134,33 @@ static void CreateControls(HWND hwnd) {
 }
 
 
+HWND checkBoxHwnd;
 
+static void CreateCheckBox(HWND hwnd)
+{
+    checkBoxHwnd = CreateWindow(TEXT("button"), TEXT("WarningMsg"),
+                         WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+                         90, 15, 130, 35,
+                         hwnd, (HMENU) 1, NULL, NULL);
+
+      SendMessage(checkBoxHwnd, BM_SETCHECK, warning, 0);
+}
+
+
+static void ChangeCheckBox(WPARAM wp)
+{
+    switch (HIWORD(wp))
+    {
+          case BN_CLICKED:
+          {
+              if(LOWORD( wp ) == 1)
+              {
+                 warning = Button_GetCheck(checkBoxHwnd);
+              }
+           break;
+          }
+    }
+}
 
 void ChangeControls(LPARAM lp)
 {
@@ -172,10 +203,15 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
     {
     case WM_CREATE:
         CreateControls(hwnd);
-
+        CreateCheckBox(hwnd);
+        break;
+    case WM_COMMAND:
+        ChangeCheckBox(wp);
         break;
     case WM_CLOSE://  Close Message
-        //if(MessageBox(NULL,"Du you wont exit?","",MB_YESNO|MB_ICONQUESTION) == IDYES)
+        if(warning)
+        if(MessageBox(NULL,"Du you wont exit?","",MB_YESNO|MB_ICONQUESTION) != IDYES)
+            return 0;
         {
             settings(true);// save settings
             hibernatorStop();
@@ -214,13 +250,11 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, int nCmdShow)
 {
+    bool firstStart = settings(false);// load settings
     HWND hMainWnd;
     MSG uMsg;
 
     hIconImg = CreateIconFromResourceEx((PBYTE)icon , iconSize, TRUE, 0x30000, icon_width, icon_height, LR_DEFAULTCOLOR);
-
-
-
 
     WNDCLASSEX wc = {0};
     memset(&wc, 0, sizeof(WNDCLASSEX));
@@ -243,8 +277,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
     RegisterHotKey(hMainWnd, HOTKEY, MOD_ALT | MOD_CONTROL, 'P'); // Ctrl+Alt+P
 
 
-
-    bool firstStart = settings(false);// load settings
     updateText();
     notyfyiconInit(hMainWnd);
 
@@ -260,7 +292,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
        notyfyiconNumberViewToogle(minutesOff);// toogle number view
     }
 
-    hibernatorStart(&minutesOff);
+    hibernatorStart(&minutesOff,&warning);
     //addToStartUp(0); // добавить программу в автозагрузку
     //takeScreenShot();// тест скриншота
 
