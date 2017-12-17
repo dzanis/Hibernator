@@ -59,12 +59,9 @@ static HICON CreateSmallIcon( HWND hWnd , TCHAR *szText)
     return hIcon;
 }
 
-static int lastInputTime = 0;
+
 static int prevlastInputTime = 0;
-
 static boolean viewToogle = FALSE;
-static int nc_minutesOff;
-
 
 static void setIconNumber(int number)
 {
@@ -85,9 +82,8 @@ void notyfyiconNumberViewToogle()
 }
 
 /// lastInputTime - последняя активность пользователя в минутах
-void notyfyiconUpdate(int _lastInputTime)//обновление иконки в трее
+void notyfyiconUpdate(int lastInputTime)//обновление иконки в трее
 {
-    lastInputTime = _lastInputTime;
     // такая логика обновляет иконку не чаще одного раза в минуту
     if( (lastInputTime == 0 && prevlastInputTime > 0) ||
         (lastInputTime - prevlastInputTime >= 1)   )
