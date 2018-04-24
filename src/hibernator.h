@@ -61,18 +61,21 @@ DWORD WINAPI message_thread_func()
     HWND hwndMsgBox = FindWindow(0,"HibernateConfirm");
     HWND hwndButton = FindWindowEx(hwndMsgBox, 0, "Button", 0);
 
+
     if (hwndMsgBox != 0 && hwndButton != 0)
     {
         // длбавляем обратный отсчёт на кнопку
         wchar_t buf[10];
         GetWindowTextW(hwndButton,buf,10);
         wcscat(buf,L" (%ld)");
-        for(int i = 15; i > 0; i --)
+        for(int i = 60; i > 0; i --) // отсчёт 60 секунд
         {
+            if((GetLastInputTime()/60) < minutesOff )// если была активность
+                SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"
             wchar_t button_text[10];
             wsprintfW(button_text,buf, i);
-
             SetWindowTextW(hwndButton, button_text);
+            SetWindowText(hwndMsgBox, "New Text");
             Sleep( 1000 );
         }
 
@@ -111,7 +114,7 @@ DWORD WINAPI thread_func(void *arg)
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
             //модальное вопросительное окно
             if(warning)
-            if(MessageBox(NULL,"Du you wont hibernate?","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
+            if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
                 continue;
             {
                 //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
