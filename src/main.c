@@ -14,14 +14,18 @@
 #include "screenshoter.h"
 #include "settings.h"
 
+#define PROGRAM_NAME "Hibernator"
+#define WIDTH  340
+#define HEIGHT  160
 
 
- HICON hIconImg;// иконка программы
+HICON hIconImg;// иконка программы
 
-const int width = 340;
-const int height = 160;
 
-const char programName[] = "Hibernator 17.12.17";
+
+
+
+const char programName[] = PROGRAM_NAME;
 const wchar_t textInfo[] = L"При бездействии пользователя,\n гибернизация начнётся через %ld мин \nСвернуть для фоновой работы. \nВ трее индикация бездействия в минутах\nСкриншот региона дисплея Ctrl+Alt+P";
 
 
@@ -232,9 +236,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
     wc.hIcon = hIconImg;
     RegisterClassEx(&wc);
 
-    hMainWnd = CreateWindow(programName, programName,  WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX,
-        (GetSystemMetrics(SM_CXSCREEN) - width) / 2, (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
-        width, height, 0, 0, hInstance, 0);
+
+    char tmp_programName[50]; // MAKE THIS BIG ENOUGH!
+    sprintf(tmp_programName, "%s (%s)", PROGRAM_NAME,__DATE__ );
+
+    hMainWnd = CreateWindow(programName, tmp_programName,  WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX,
+        (GetSystemMetrics(SM_CXSCREEN) - WIDTH) / 2, (GetSystemMetrics(SM_CYSCREEN) - HEIGHT) / 2,
+        WIDTH, HEIGHT, 0, 0, hInstance, 0);
 
 
     RegisterHotKey(hMainWnd, HOTKEY, MOD_ALT | MOD_CONTROL, 'P'); // Ctrl+Alt+P
