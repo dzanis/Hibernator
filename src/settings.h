@@ -12,7 +12,7 @@ typedef enum { false, true } bool;
 
 char  minutesOff = 30; //через сколько минут выключить, от 1 до 99 минут
 bool  warning = false; // показывать предупреждения
-
+bool timerinvert = false;//сколько минут нет активности или сколько осталось до гибернации
 
 
 
@@ -33,6 +33,7 @@ bool settings_save(bool save)
         {
         fputc(minutesOff,f);
         fputc(warning,f);
+        fputc(timerinvert,f);
         }
 
     }
@@ -43,6 +44,7 @@ bool settings_save(bool save)
         {
             minutesOff = fgetc(f);
             warning = fgetc(f);
+            timerinvert = fgetc(f);
             firstStart = false;
         }
     }

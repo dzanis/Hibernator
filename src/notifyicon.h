@@ -61,11 +61,10 @@ static HICON CreateSmallIcon( HWND hWnd , TCHAR *szText)
 
 
 static int prevlastInputTime = 0;
-static boolean viewToogle = FALSE;
 
 static void setIconNumber(int number)
 {
-    number = viewToogle ? number : minutesOff - number;
+    number = !timerinvert ? number : minutesOff - number;
     TCHAR buf[2] ;
     sprintf( buf, TEXT( number > 9 ? "%d" : " %d" ), number ) ;
     pnid.hIcon = CreateSmallIcon(NULL,buf);
@@ -73,11 +72,8 @@ static void setIconNumber(int number)
 }
 
 
-///функция нужна для переключения показа вариантов вида отсчета
-///или сколько минут нет активности или сколько осталось до гибернации
 void notyfyiconNumberViewToogle()
 {
-   viewToogle = !viewToogle;
    setIconNumber(0);
 }
 

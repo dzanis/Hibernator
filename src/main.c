@@ -102,15 +102,21 @@ static void CreateControls(HWND hwnd)
 
 
 HWND checkBoxHwnd;
+HWND checkBox2Hwnd;
 
 static void CreateCheckBox(HWND hwnd)
 {
     checkBoxHwnd = CreateWindow(TEXT("button"), TEXT("WarningMsg"),
-                         WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
-                         90, 15, 130, 35,
-                         hwnd, (HMENU) 1, NULL, NULL);
+                                WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+                                90, 15, 110, 35,
+                                hwnd, (HMENU) 1, NULL, NULL);
+    SendMessage(checkBoxHwnd, BM_SETCHECK, warning, 0);
 
-      SendMessage(checkBoxHwnd, BM_SETCHECK, warning, 0);
+    checkBox2Hwnd = CreateWindow(TEXT("button"), TEXT("TimerInvert"),
+                                 WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+                                 210, 15, 110, 35,
+                                 hwnd, (HMENU) 1, NULL, NULL);
+    SendMessage(checkBox2Hwnd, BM_SETCHECK, timerinvert, 0);
 }
 
 
@@ -123,6 +129,7 @@ static void ChangeCheckBox(WPARAM wp)
               if(LOWORD( wp ) == 1)
               {
                  warning = Button_GetCheck(checkBoxHwnd);
+                 timerinvert = Button_GetCheck(checkBox2Hwnd);
               }
            break;
           }
@@ -260,7 +267,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
     {
        ShowWindow(hMainWnd, SW_HIDE);
        Shell_NotifyIcon(NIM_ADD, &pnid);
-       notyfyiconNumberViewToogle();// toogle number view
     }
 
     hibernatorStart();
