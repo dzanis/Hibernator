@@ -62,22 +62,19 @@ DWORD WINAPI message_thread_func()
 
     HWND hwndMsgBox = FindWindow(0,"HibernateConfirm");
     HWND hwndButton = FindWindowEx(hwndMsgBox, 0, "Button", 0);
-
+    ShowWindow(hwndButton,SW_HIDE);
 
     if (hwndMsgBox != 0 && hwndButton != 0)
     {
-        // длбавляем обратный отсчёт на кнопку
-        wchar_t buf[10];
-        GetWindowTextW(hwndButton,buf,10);
-        wcscat(buf,L" (%ld)");
+        // длбавляем обратный отсчёт на титле
+
         for(int i = 30; i > 0; i --) // отсчёт 30 секунд
         {
             if((GetLastInputTime()/60) < minutesOff )// если была активность
                 SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"
-            wchar_t button_text[10];
-            wsprintfW(button_text,buf, i);
-            SetWindowTextW(hwndButton, button_text);
-            SetWindowText(hwndMsgBox, "HibernateConfirm");
+            char title_text[50];
+            sprintf(title_text, "HibernateConfirm %ld", i);
+            SetWindowText(hwndMsgBox,  title_text);
             Sleep( 1000 );
         }
 
@@ -120,7 +117,7 @@ DWORD WINAPI thread_func(void *arg)
                 HWND fullWindow = CreateFullscreenWindow( NULL, NULL);// белое окно на весь экран
                 SetWindowPos(fullWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE);// чтобы было по верх всех остальных окон
                 //модальное вопросительное окно
-                if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_YESNO|MB_ICONEXCLAMATION|MB_SYSTEMMODAL   ) != IDYES)
+                if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_OKCANCEL | MB_ICONEXCLAMATION|MB_SYSTEMMODAL   ) != IDYES)
                 {
                    DestroyWindow(fullWindow);
                     continue;
