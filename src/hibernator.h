@@ -70,7 +70,7 @@ DWORD WINAPI message_thread_func()
         wchar_t buf[10];
         GetWindowTextW(hwndButton,buf,10);
         wcscat(buf,L" (%ld)");
-        for(int i = 60; i > 0; i --) // отсчёт 60 секунд
+        for(int i = 30; i > 0; i --) // отсчёт 30 секунд
         {
             if((GetLastInputTime()/60) < minutesOff )// если была активность
                 SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"

@@ -184,7 +184,7 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
         break;
     case WM_CLOSE://  Close Message
         if(warning)
-        if(MessageBox(NULL,"Du you wont exit?","",MB_YESNO|MB_ICONQUESTION) != IDYES)
+        if(MessageBox(NULL,"Do you really want to exit?","",MB_YESNO|MB_ICONQUESTION) != IDYES)
             return 0;
         {
             settings_save(true);// save settings

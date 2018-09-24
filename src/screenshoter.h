@@ -371,7 +371,7 @@ void takeScreenShot()
     ShowCursor(FALSE);
 
     hMainWnd = CreateFullscreenWindow( NULL, NULL);
-
+    SetWindowPos(hMainWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE);// чтобы было по верх всех остальных окон
 
 
 
