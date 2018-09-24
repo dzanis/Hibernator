@@ -9,6 +9,7 @@
     autor: Zanis Dukalskis 19.11.2017
 ========================================================================
 */
+#pragma once
 
 #include <windows.h>
 #include <Windowsx.h>

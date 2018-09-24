@@ -18,6 +18,7 @@
 #include <windows.h>
 #include "notifyicon.h"
 #include "settings.h"
+#include "screenshoter.h" // for CreateFullscreenWindow
 
 HANDLE thread;
 DWORD WINAPI thread_func(void *arg);
@@ -53,6 +54,7 @@ static int GetLastInputTime()
     return (( idleTime > 0 ) ? ( idleTime / 1000 ) : idleTime );
 }
 
+
 /// ожидание отмены пред гибернизацией с обратным отсчётом на кнопке
 DWORD WINAPI message_thread_func()
 {
@@ -75,7 +77,7 @@ DWORD WINAPI message_thread_func()
             wchar_t button_text[10];
             wsprintfW(button_text,buf, i);
             SetWindowTextW(hwndButton, button_text);
-            SetWindowText(hwndMsgBox, "New Text");
+            SetWindowText(hwndMsgBox, "HibernateConfirm");
             Sleep( 1000 );
         }
 
@@ -84,7 +86,6 @@ DWORD WINAPI message_thread_func()
     }
 
 }
-
 
 
 static int hibernatorStartHibernation = 0;
@@ -112,13 +113,25 @@ DWORD WINAPI thread_func(void *arg)
         if(lastInputTime >= minutesOff )
         {            
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
-            //модальное вопросительное окно
+
+
             if(warning)
-            if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_YESNO|MB_ICONQUESTION|MB_SYSTEMMODAL   ) != IDYES)
-                continue;
             {
-                //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
-                system("shutdown -h");//переводим компьютер в гибернацию
+                HWND fullWindow = CreateFullscreenWindow( NULL, NULL);// белое окно на весь экран
+                SetWindowPos(fullWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE);// чтобы было по верх всех остальных окон
+                //модальное вопросительное окно
+                if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_YESNO|MB_ICONEXCLAMATION|MB_SYSTEMMODAL   ) != IDYES)
+                {
+                   DestroyWindow(fullWindow);
+                    continue;
+                }
+                else
+                {
+                    DestroyWindow(fullWindow);
+                    //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
+                    system("shutdown -h");//переводим компьютер в гибернацию
+                }
+
             }
 
             CloseHandle(thread);
