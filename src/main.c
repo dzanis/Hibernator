@@ -146,7 +146,10 @@ void ChangeControls(LPARAM lp)
 
         lpnmud = (NMUPDOWN *) lp;
 
-        minutesOff = lpnmud->iPos + lpnmud->iDelta;
+        int step = 5;
+        if(minutesOff == 1 || minutesOff == 99)
+            step = 4;
+        minutesOff = lpnmud->iPos + lpnmud->iDelta * step;
 
         if (minutesOff < UD_MIN_POS) {
             minutesOff = UD_MIN_POS;
