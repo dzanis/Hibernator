@@ -29,7 +29,8 @@ const char programName[] = PROGRAM_NAME;
 const wchar_t textInfo[] = L"При бездействии пользователя,\n гибернизация начнётся через %ld мин \nСвернуть для фоновой работы. \nВ трее индикация бездействия в минутах\nСкриншот региона дисплея Ctrl+Alt+P";
 
 
-#define HOTKEY 1000
+#define HOTKEY_SCREENSHOT 1
+#define HOTKEY_HIBERNATE 2
 
 
 
@@ -208,7 +209,10 @@ LRESULT WINAPI WindowProc(HWND hwnd, UINT uMsg, WPARAM wp, LPARAM lp)
         ChangeControls(lp);
         break;
     case WM_HOTKEY:
-        takeScreenShot();
+        if (HOTKEY_SCREENSHOT == (int)wp)
+            takeScreenShot();
+        if (HOTKEY_HIBERNATE == (int)wp)
+            hibernatorFast();
         break;
     case WM_POWERBROADCAST:
         if(wp == PBT_APMSUSPEND)
@@ -255,8 +259,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, 
         WIDTH, HEIGHT, 0, 0, hInstance, 0);
 
 
-    RegisterHotKey(hMainWnd, HOTKEY, MOD_ALT | MOD_CONTROL, 'P'); // Ctrl+Alt+P
-
+    RegisterHotKey(hMainWnd, HOTKEY_SCREENSHOT, MOD_ALT | MOD_CONTROL, 'P'); // Ctrl+Alt+P
+    RegisterHotKey(hMainWnd, HOTKEY_HIBERNATE, MOD_ALT | MOD_CONTROL, 'H'); // Ctrl+Alt+H
 
     updateText();
     notyfyiconInit(hMainWnd);

@@ -22,7 +22,7 @@
 
 HANDLE thread;
 DWORD WINAPI thread_func(void *arg);
-
+bool hibernatorCanFast = false;
 
 /// minutes - количество минут неактивности пользователя,после прошествия которых отправить в гибернацию
 void hibernatorStart()
@@ -70,7 +70,7 @@ DWORD WINAPI message_thread_func()
 
         for(int i = 30; i > 0; i --) // отсчёт 30 секунд
         {
-            if((GetLastInputTime()/60) < minutesOff )// если была активность
+            if((GetLastInputTime()/60) < minutesOff && !hibernatorCanFast)// если была активность
                 SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"
             char title_text[50];
             sprintf(title_text, "HibernateConfirm %ld", i);
@@ -107,8 +107,9 @@ DWORD WINAPI thread_func(void *arg)
         int lastInputTime = GetLastInputTime()/60;// convert sec to min
         notyfyiconUpdate(lastInputTime);//обновление иконки в трее
 
-        if(lastInputTime >= minutesOff )
-        {            
+        if(lastInputTime >= minutesOff || hibernatorCanFast)
+        {
+
             HANDLE thread = CreateThread(NULL,0,message_thread_func,NULL, 0, NULL);
 
 
@@ -130,13 +131,17 @@ DWORD WINAPI thread_func(void *arg)
                 }
 
             }
-
             CloseHandle(thread);
         }
+        hibernatorCanFast = false;
         Sleep(1000);
     }
 }
 
+void hibernatorFast()
+{
+    hibernatorCanFast = !hibernatorCanFast;
+}
 
 void hibernatorIsHibernation()
 {
