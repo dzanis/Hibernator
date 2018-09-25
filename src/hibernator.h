@@ -120,18 +120,17 @@ DWORD WINAPI thread_func(void *arg)
                 //модальное вопросительное окно
                 if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_OKCANCEL | MB_ICONEXCLAMATION|MB_SYSTEMMODAL   ) != IDYES)
                 {
-                   DestroyWindow(fullWindow);
+                    DestroyWindow(fullWindow);
                     continue;
                 }
-                else
-                {
-                    DestroyWindow(fullWindow);
-                    //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
-                    system("shutdown -h");//переводим компьютер в гибернацию
-                }
-
+                DestroyWindow(fullWindow);
             }
             CloseHandle(thread);
+            {
+                //MessageBox(NULL,"shutdown","",MB_OK|MB_ICONEXCLAMATION);
+                system("shutdown -h");//переводим компьютер в гибернацию
+            }
+
         }
         hibernatorCanFast = false;
         Sleep(1000);
