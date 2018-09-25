@@ -121,6 +121,7 @@ DWORD WINAPI thread_func(void *arg)
                 if(MessageBox(NULL,"Move mouse or press any key \nto interrupt the hibernation","HibernateConfirm", MB_OKCANCEL | MB_ICONEXCLAMATION|MB_SYSTEMMODAL   ) != IDYES)
                 {
                     DestroyWindow(fullWindow);
+                    hibernatorCanFast = false;
                     continue;
                 }
                 DestroyWindow(fullWindow);
