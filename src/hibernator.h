@@ -70,8 +70,9 @@ DWORD WINAPI message_thread_func()
 
         for(int i = 30; i > 0; i --) // отсчёт 30 секунд
         {
-            if((GetLastInputTime()/60) < minutesOff && !hibernatorCanFast)// если была активность
-                SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"
+            // то что тут закомментировал для Димона,чтобы у него был таймер после пробуждения компа,но не сработает отмена от "Move mouse"
+            //if((GetLastInputTime()/60) < minutesOff && !hibernatorCanFast)// если была активность
+                //SendMessageW(hwndMsgBox, WM_COMMAND, IDNO | (BN_CLICKED << 16), (LPARAM)hwndButton); //то симулируем нажатие "Нет"
             char title_text[50];
             sprintf(title_text, "HibernateConfirm %ld", i);
             SetWindowText(hwndMsgBox,  title_text);
